@@ -6,7 +6,7 @@ import plotly.express as px
 from pathlib import Path
 from src.anomaly_detector import detect_anomalies
 from src.history_manager import save_history, load_history
-
+from src.pdf_report import generate_pdf
 
 # =====================================
 # KONFIGURASI HALAMAN
@@ -212,7 +212,8 @@ if st.button(
             # Simpan hasil pada session
             st.session_state["results"] = results
             st.session_state["original_data"] = data.copy()
-
+            st.session_state["source_name"] = source_name
+            st.session_state["contamination"] = contamination
         st.success("Analisis berhasil diselesaikan!")
 
     except Exception as e:
@@ -369,6 +370,36 @@ if "results" in st.session_state:
         mime="text/csv",
         use_container_width=True
     )
+
+    # =================================
+    # DOWNLOAD PDF REPORT
+    # =================================
+
+    st.subheader("📄 Download PDF Report")
+
+    try:
+        pdf_file = generate_pdf(
+            results,
+            st.session_state.get(
+                "source_name",
+                "Dataset"
+            ),
+            st.session_state.get(
+                "contamination",
+                0.10
+            )
+        )
+
+        st.download_button(
+            label="⬇️ Download PDF Report",
+            data=pdf_file,
+            file_name="anomaly_detection_report.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
+
+    except Exception as e:
+        st.error(f"Gagal membuat laporan PDF: {e}")
 
 
 # =====================================
