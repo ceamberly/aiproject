@@ -35,6 +35,7 @@ if "user" not in st.session_state:
 
 st.sidebar.title("🤖 AI Security System")
 
+
 # =====================================
 # ACCOUNT / AUTHENTICATION
 # =====================================
@@ -73,7 +74,6 @@ else:
 
             if isinstance(response, dict) and "error" in response:
                 st.sidebar.error(response["error"])
-
             else:
                 st.sidebar.success("Login berhasil!")
                 st.rerun()
@@ -119,6 +119,7 @@ else:
 
                 else:
                     st.sidebar.success("Registrasi berhasil!")
+
 
 st.sidebar.divider()
 
@@ -213,63 +214,61 @@ if menu == "Anomaly Detection":
         "yang berpotensi ditandai anomali."
     )
 
-    # UPLOAD DATASET
-
     # =====================================
-# UPLOAD DATASET MULTI-FORMAT
-# =====================================
+    # UPLOAD DATASET MULTI-FORMAT
+    # =====================================
 
-st.subheader("📁 Dataset")
+    st.subheader("📁 Dataset")
 
-uploaded_file = st.file_uploader(
-    "Upload dataset untuk dianalisis",
-    type=[
-        "csv",
-        "txt",
-        "log",
-        "xlsx",
-        "xls",
-        "pdf",
-        "docx",
-        "json"
-    ],
-    help="Format yang didukung: CSV, TXT, LOG, Excel, PDF, DOCX, JSON."
-)
+    uploaded_file = st.file_uploader(
+        "Upload dataset untuk dianalisis",
+        type=[
+            "csv",
+            "txt",
+            "log",
+            "xlsx",
+            "xls",
+            "pdf",
+            "docx",
+            "json"
+        ],
+        help="Format yang didukung: CSV, TXT, LOG, Excel, PDF, DOCX, JSON."
+    )
 
-if uploaded_file is not None:
+    if uploaded_file is not None:
 
-    try:
-        with st.spinner("Membaca dan memproses file..."):
-            data = parse_uploaded_file(uploaded_file)
+        try:
+            with st.spinner("Membaca dan memproses file..."):
+                data = parse_uploaded_file(uploaded_file)
 
-        source_name = uploaded_file.name
+            source_name = uploaded_file.name
 
-        st.success(
-            f"File {source_name} berhasil dibaca!"
-        )
+            st.success(f"File {source_name} berhasil dibaca!")
 
-    except Exception as e:
-        st.error(f"Gagal membaca file: {e}")
-        st.stop()
-
-else:
-
-    sample_path = Path("data/sample_data.csv")
-
-    if sample_path.exists():
-        data = pd.read_csv(sample_path)
-        source_name = "sample_data.csv"
-
-        st.info(
-            "Belum ada file diunggah. "
-            "Menggunakan dataset percobaan bawaan."
-        )
+        except Exception as e:
+            st.error(f"Gagal membaca file: {e}")
+            st.stop()
 
     else:
-        st.warning("Silakan upload dataset terlebih dahulu.")
-        st.stop()
 
+        sample_path = Path("data/sample_data.csv")
+
+        if sample_path.exists():
+            data = pd.read_csv(sample_path)
+            source_name = "sample_data.csv"
+
+            st.info(
+                "Belum ada file diunggah. "
+                "Menggunakan dataset percobaan bawaan."
+            )
+
+        else:
+            st.warning("Silakan upload dataset terlebih dahulu.")
+            st.stop()
+
+    # =====================================
     # DATA PREVIEW
+    # =====================================
 
     st.markdown("### Dataset Preview")
 
@@ -286,10 +285,11 @@ else:
         use_container_width=True
     )
 
+    # =====================================
     # FEATURE SELECTION
+    # =====================================
 
     st.divider()
-
     st.subheader("🧠 Model Configuration")
 
     numeric_columns = data.select_dtypes(
@@ -297,6 +297,7 @@ else:
     ).columns.tolist()
 
     if not numeric_columns:
+
         st.error("Dataset tidak memiliki kolom numerik.")
 
     else:
@@ -316,11 +317,14 @@ else:
         )
 
         if not selected_features:
+
             st.warning("Pilih minimal satu kolom numerik.")
 
         else:
 
+            # =====================================
             # RUN DETECTION
+            # =====================================
 
             if st.button(
                 "🚀 Run Anomaly Detection",
@@ -329,6 +333,7 @@ else:
             ):
 
                 try:
+
                     with st.spinner("AI sedang menganalisis dataset..."):
 
                         analysis_data = data[selected_features].copy()
@@ -355,7 +360,9 @@ else:
                 except Exception as e:
                     st.error(f"Terjadi kesalahan saat analisis: {e}")
 
+    # =====================================
     # DISPLAY RESULTS
+    # =====================================
 
     if "results" in st.session_state:
 
@@ -384,6 +391,7 @@ else:
         metric1.metric("Total Data", f"{total_data:,}")
         metric2.metric("Normal Data", f"{normal_count:,}")
         metric3.metric("Anomaly Data", f"{anomaly_count:,}")
+
         metric4.metric(
             "Anomaly Percentage",
             f"{anomaly_percentage:.2f}%"
@@ -593,12 +601,15 @@ else:
         except Exception as e:
             st.error(f"Gagal membuat laporan PDF: {e}")
 
+    # =====================================
     # ANALYSIS HISTORY
+    # =====================================
 
     st.divider()
     st.subheader("🕘 Analysis History")
 
     if not user_id:
+
         st.info(
             "Kamu sedang menggunakan mode tamu. "
             "Riwayat hanya tersimpan sementara selama sesi ini. "
@@ -770,6 +781,7 @@ elif menu == "URL Security Detector":
     st.subheader("📜 Riwayat Pemeriksaan URL")
 
     if not user_id:
+
         st.info(
             "Kamu sedang menggunakan mode tamu. "
             "Riwayat URL hanya tersimpan sementara selama sesi ini. "
