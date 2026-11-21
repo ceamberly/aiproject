@@ -4,7 +4,7 @@ import plotly.express as px
 from pathlib import Path
 
 from src.anomaly_detector import detect_anomalies
-
+from src.history_manager import save_history, load_history
 
 # =====================================
 # KONFIGURASI HALAMAN
