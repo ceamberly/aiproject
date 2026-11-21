@@ -8,3 +8,7 @@ plotly
 joblib
 reportlab
 supabase
+pypdf
+python-docx
+openpyxl
+xlrd

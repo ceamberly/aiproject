@@ -6,6 +6,7 @@ import json
 
 from pathlib import Path
 
+from src.file_parser import parse_uploaded_file
 from src.anomaly_detector import detect_anomalies
 from src.history_manager import save_history, load_history
 from src.pdf_report import generate_pdf
@@ -214,36 +215,59 @@ if menu == "Anomaly Detection":
 
     # UPLOAD DATASET
 
-    st.subheader("📁 Dataset")
+    # =====================================
+# UPLOAD DATASET MULTI-FORMAT
+# =====================================
 
-    uploaded_file = st.file_uploader(
-        "Upload dataset CSV",
-        type=["csv"]
-    )
+st.subheader("📁 Dataset")
 
-    if uploaded_file is not None:
+uploaded_file = st.file_uploader(
+    "Upload dataset untuk dianalisis",
+    type=[
+        "csv",
+        "txt",
+        "log",
+        "xlsx",
+        "xls",
+        "pdf",
+        "docx",
+        "json"
+    ],
+    help="Format yang didukung: CSV, TXT, LOG, Excel, PDF, DOCX, JSON."
+)
 
-        try:
-            data = pd.read_csv(uploaded_file)
-            source_name = uploaded_file.name
-            st.success("Dataset berhasil dimuat!")
+if uploaded_file is not None:
 
-        except Exception as e:
-            st.error(f"Gagal membaca dataset: {e}")
-            st.stop()
+    try:
+        with st.spinner("Membaca dan memproses file..."):
+            data = parse_uploaded_file(uploaded_file)
+
+        source_name = uploaded_file.name
+
+        st.success(
+            f"File {source_name} berhasil dibaca!"
+        )
+
+    except Exception as e:
+        st.error(f"Gagal membaca file: {e}")
+        st.stop()
+
+else:
+
+    sample_path = Path("data/sample_data.csv")
+
+    if sample_path.exists():
+        data = pd.read_csv(sample_path)
+        source_name = "sample_data.csv"
+
+        st.info(
+            "Belum ada file diunggah. "
+            "Menggunakan dataset percobaan bawaan."
+        )
 
     else:
-
-        sample_path = Path("data/sample_data.csv")
-
-        if sample_path.exists():
-            data = pd.read_csv(sample_path)
-            source_name = "sample_data.csv"
-            st.info("Menggunakan dataset percobaan bawaan.")
-
-        else:
-            st.warning("Silakan upload dataset CSV.")
-            st.stop()
+        st.warning("Silakan upload dataset terlebih dahulu.")
+        st.stop()
 
     # DATA PREVIEW
 
