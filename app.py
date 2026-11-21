@@ -1,10 +1,12 @@
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from pathlib import Path
 
+from pathlib import Path
 from src.anomaly_detector import detect_anomalies
 from src.history_manager import save_history, load_history
+
 
 # =====================================
 # KONFIGURASI HALAMAN
@@ -74,7 +76,6 @@ st.divider()
 # =====================================
 
 st.sidebar.title("⚙️ Configuration")
-
 st.sidebar.markdown("### Model Settings")
 
 contamination = st.sidebar.slider(
@@ -87,7 +88,8 @@ contamination = st.sidebar.slider(
 )
 
 st.sidebar.caption(
-    "Semakin tinggi nilainya, semakin banyak data yang berpotensi ditandai anomali."
+    "Semakin tinggi nilainya, semakin banyak data "
+    "yang berpotensi ditandai anomali."
 )
 
 
@@ -105,7 +107,9 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     try:
         data = pd.read_csv(uploaded_file)
+        source_name = uploaded_file.name
         st.success("Dataset berhasil dimuat!")
+
     except Exception as e:
         st.error(f"Gagal membaca dataset: {e}")
         st.stop()
@@ -115,9 +119,11 @@ else:
 
     if sample_path.exists():
         data = pd.read_csv(sample_path)
+        source_name = "sample_data.csv"
         st.info("Menggunakan dataset percobaan bawaan.")
+
     else:
-        st.warning("Silakan upload dataset CSV untuk memulai analisis.")
+        st.warning("Silakan upload dataset CSV.")
         st.stop()
 
 
@@ -196,6 +202,14 @@ if st.button(
                 contamination=contamination
             )
 
+            # Simpan riwayat analisis
+            save_history(
+                results,
+                source_name,
+                contamination
+            )
+
+            # Simpan hasil pada session
             st.session_state["results"] = results
             st.session_state["original_data"] = data.copy()
 
@@ -214,7 +228,6 @@ if "results" in st.session_state:
     results = st.session_state["results"]
 
     st.divider()
-
     st.subheader("📊 Analysis Overview")
 
     total_data = len(results)
@@ -229,25 +242,14 @@ if "results" in st.session_state:
 
     anomaly_percentage = (
         anomaly_count / total_data * 100
+        if total_data > 0 else 0
     )
 
     metric1, metric2, metric3, metric4 = st.columns(4)
 
-    metric1.metric(
-        "Total Data",
-        f"{total_data:,}"
-    )
-
-    metric2.metric(
-        "Normal Data",
-        f"{normal_count:,}"
-    )
-
-    metric3.metric(
-        "Anomaly Data",
-        f"{anomaly_count:,}"
-    )
-
+    metric1.metric("Total Data", f"{total_data:,}")
+    metric2.metric("Normal Data", f"{normal_count:,}")
+    metric3.metric("Anomaly Data", f"{anomaly_count:,}")
     metric4.metric(
         "Anomaly Percentage",
         f"{anomaly_percentage:.2f}%"
@@ -259,7 +261,6 @@ if "results" in st.session_state:
     # =================================
 
     st.divider()
-
     st.subheader("📈 Data Visualization")
 
     chart1, chart2 = st.columns(2)
@@ -328,7 +329,6 @@ if "results" in st.session_state:
     # =================================
 
     st.divider()
-
     st.subheader("🔍 Detection Results")
 
     filter_status = st.selectbox(
@@ -368,6 +368,68 @@ if "results" in st.session_state:
         file_name="anomaly_detection_results.csv",
         mime="text/csv",
         use_container_width=True
+    )
+
+
+# =====================================
+# ANALYSIS HISTORY
+# =====================================
+
+st.divider()
+st.subheader("🕘 Analysis History")
+
+history = load_history()
+
+if history:
+
+    st.write(
+        f"Total analisis tersimpan: **{len(history)}**"
+    )
+
+    # Riwayat terbaru ditampilkan paling atas
+    for item in reversed(history):
+
+        with st.expander(
+            f"📁 {item['source']} — {item['timestamp']}"
+        ):
+
+            col1, col2, col3 = st.columns(3)
+
+            col1.metric(
+                "Total Data",
+                item["total_data"]
+            )
+
+            col2.metric(
+                "Normal",
+                item["normal"]
+            )
+
+            col3.metric(
+                "Anomaly",
+                item["anomaly"]
+            )
+
+            st.write(
+                f"Contamination: {item['contamination']}"
+            )
+
+            st.write("Detail hasil analisis:")
+
+            history_results = pd.DataFrame(
+                item["results"]
+            )
+
+            st.dataframe(
+                history_results,
+                use_container_width=True
+            )
+
+else:
+
+    st.info(
+        "Belum ada riwayat analisis. "
+        "Jalankan deteksi anomali terlebih dahulu."
     )
 
 
