@@ -4,3 +4,5 @@ __pycache__/
 .streamlit/secrets.toml
 .env
 reports/*.json
+history_backup.json
+url_history_backup.json

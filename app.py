@@ -6,12 +6,12 @@ import json
 
 from pathlib import Path
 
-from src.auth_manager import register_user, login_user, logout_user
 from src.anomaly_detector import detect_anomalies
 from src.history_manager import save_history, load_history
 from src.pdf_report import generate_pdf
 from src.url_detector import analyze_url
 from src.url_history import save_url_history, load_url_history
+from src.auth_manager import register_user, login_user, logout_user
 
 
 # =====================================
@@ -24,20 +24,22 @@ st.set_page_config(
     layout="wide"
 )
 
+if "user" not in st.session_state:
+    st.session_state["user"] = None
+
 
 # =====================================
 # SIDEBAR NAVIGATION
 # =====================================
 
 st.sidebar.title("🤖 AI Security System")
+
 # =====================================
 # ACCOUNT / AUTHENTICATION
 # =====================================
 
-if "user" not in st.session_state:
-    st.session_state["user"] = None
-
 if st.session_state["user"]:
+
     st.sidebar.success(
         f"Login sebagai: {st.session_state['user']['email']}"
     )
@@ -47,6 +49,7 @@ if st.session_state["user"]:
         st.rerun()
 
 else:
+
     auth_mode = st.sidebar.radio(
         "Akun Pengguna",
         ["Tamu", "Login", "Registrasi"]
@@ -57,16 +60,19 @@ else:
         with st.sidebar.form("login_form"):
             email = st.text_input("Email")
             password = st.text_input("Password", type="password")
+
             login_submit = st.form_submit_button(
                 "Login",
                 use_container_width=True
             )
 
         if login_submit:
+
             response = login_user(email, password)
 
             if isinstance(response, dict) and "error" in response:
                 st.sidebar.error(response["error"])
+
             else:
                 st.sidebar.success("Login berhasil!")
                 st.rerun()
@@ -98,14 +104,22 @@ else:
                 st.sidebar.warning("Password minimal 6 karakter.")
 
             else:
+
                 response = register_user(email, password)
 
                 if isinstance(response, dict) and "error" in response:
                     st.sidebar.error(response["error"])
-                else:
+
+                elif getattr(response, "session", None) is None:
                     st.sidebar.success(
-                        "Registrasi berhasil. Periksa email jika diminta verifikasi."
+                        "Registrasi berhasil. Silakan periksa email "
+                        "untuk verifikasi, kemudian login."
                     )
+
+                else:
+                    st.sidebar.success("Registrasi berhasil!")
+
+st.sidebar.divider()
 
 menu = st.sidebar.radio(
     "Pilih Fitur",
@@ -154,6 +168,14 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+
+# =====================================
+# USER SESSION
+# =====================================
+
+user = st.session_state.get("user")
+user_id = user["id"] if user else None
 
 
 # =====================================
@@ -295,7 +317,8 @@ if menu == "Anomaly Detection":
                         save_history(
                             results,
                             source_name,
-                            contamination
+                            contamination,
+                            user_id=user_id
                         )
 
                         st.session_state["results"] = results
@@ -551,47 +574,48 @@ if menu == "Anomaly Detection":
     st.divider()
     st.subheader("🕘 Analysis History")
 
-    history = load_history()
-
-    if history:
-
-        st.write(
-            f"Total analisis tersimpan: **{len(history)}**"
-        )
-
-        for item in reversed(history):
-
-            with st.expander(
-                f"📁 {item['source']} — {item['timestamp']}"
-            ):
-
-                col1, col2, col3 = st.columns(3)
-
-                col1.metric("Total Data", item["total_data"])
-                col2.metric("Normal", item["normal"])
-                col3.metric("Anomaly", item["anomaly"])
-
-                st.write(
-                    f"Contamination: {item['contamination']}"
-                )
-
-                st.write("Detail hasil analisis:")
-
-                history_results = pd.DataFrame(
-                    item["results"]
-                )
-
-                st.dataframe(
-                    history_results,
-                    use_container_width=True
-                )
-
-    else:
-
+    if not user_id:
         st.info(
-            "Belum ada riwayat analisis. "
-            "Jalankan deteksi anomali terlebih dahulu."
+            "Kamu sedang menggunakan mode tamu. "
+            "Riwayat hanya tersimpan sementara selama sesi ini. "
+            "Login untuk menyimpan riwayat secara permanen."
         )
+
+    try:
+
+        history = load_history(user_id=user_id)
+
+        if history:
+
+            st.write(
+                f"Total analisis tersimpan: **{len(history)}**"
+            )
+
+            for item in history:
+
+                with st.expander(
+                    f"📁 {item['source']} — {item['timestamp']}"
+                ):
+
+                    col1, col2, col3 = st.columns(3)
+
+                    col1.metric("Total Data", item["total_data"])
+                    col2.metric("Normal", item["normal"])
+                    col3.metric("Anomaly", item["anomaly"])
+
+                    st.write(
+                        f"Contamination: {item['contamination']}"
+                    )
+
+        else:
+
+            st.info(
+                "Belum ada riwayat analisis. "
+                "Jalankan deteksi anomali terlebih dahulu."
+            )
+
+    except Exception as e:
+        st.error(f"Gagal memuat riwayat analisis: {e}")
 
 
 # =====================================
@@ -642,12 +666,14 @@ elif menu == "URL Security Detector":
 
                     url_result = analyze_url(url_input)
 
-                    # Simpan hasil pemeriksaan ke riwayat
-                    save_url_history(url_result)
+                    save_url_history(
+                        url_result,
+                        user_id=user_id
+                    )
 
                 st.session_state["url_result"] = url_result
 
-                st.success("Pemeriksaan URL berhasil disimpan!")
+                st.success("Pemeriksaan URL berhasil!")
 
             except Exception as e:
 
@@ -714,58 +740,68 @@ elif menu == "URL Security Detector":
             "atau file yang diunduh."
         )
 
-    # =====================================
     # URL HISTORY
-    # =====================================
 
     st.divider()
     st.subheader("📜 Riwayat Pemeriksaan URL")
 
-    url_history = load_url_history()
-
-    if url_history:
-
-        st.write(
-            f"Total pemeriksaan tersimpan: **{len(url_history)}**"
-        )
-
-        history_data = []
-
-        for item in reversed(url_history):
-
-            history_data.append({
-                "Waktu": item["timestamp"],
-                "URL": item["url"],
-                "Domain": item["domain"],
-                "Risk Level": item["risk_level"],
-                "Risk Score": item["risk_score"]
-            })
-
-        st.dataframe(
-            history_data,
-            use_container_width=True,
-            hide_index=True
-        )
-
-        history_json = json.dumps(
-            url_history,
-            indent=4,
-            ensure_ascii=False
-        )
-
-        st.download_button(
-            label="📥 Download Riwayat URL (JSON)",
-            data=history_json,
-            file_name="url_history.json",
-            mime="application/json"
-        )
-
-    else:
-
+    if not user_id:
         st.info(
-            "Belum ada riwayat pemeriksaan URL. "
-            "Silakan periksa URL terlebih dahulu."
+            "Kamu sedang menggunakan mode tamu. "
+            "Riwayat URL hanya tersimpan sementara selama sesi ini. "
+            "Login untuk menyimpan riwayat secara permanen."
         )
+
+    try:
+
+        url_history = load_url_history(user_id=user_id)
+
+        if url_history:
+
+            st.write(
+                f"Total pemeriksaan tersimpan: **{len(url_history)}**"
+            )
+
+            history_data = []
+
+            for item in reversed(url_history):
+
+                history_data.append({
+                    "Waktu": item.get("timestamp", "-"),
+                    "URL": item["url"],
+                    "Domain": item["domain"],
+                    "Risk Level": item["risk_level"],
+                    "Risk Score": item["risk_score"]
+                })
+
+            st.dataframe(
+                history_data,
+                use_container_width=True,
+                hide_index=True
+            )
+
+            history_json = json.dumps(
+                url_history,
+                indent=4,
+                ensure_ascii=False
+            )
+
+            st.download_button(
+                label="📥 Download Riwayat URL (JSON)",
+                data=history_json,
+                file_name="url_history.json",
+                mime="application/json"
+            )
+
+        else:
+
+            st.info(
+                "Belum ada riwayat pemeriksaan URL. "
+                "Silakan periksa URL terlebih dahulu."
+            )
+
+    except Exception as e:
+        st.error(f"Gagal memuat riwayat URL: {e}")
 
     st.divider()
 
