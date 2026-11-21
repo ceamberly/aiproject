@@ -2,6 +2,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import json
 
 from pathlib import Path
 
@@ -9,6 +10,7 @@ from src.anomaly_detector import detect_anomalies
 from src.history_manager import save_history, load_history
 from src.pdf_report import generate_pdf
 from src.url_detector import analyze_url
+from src.url_history import save_url_history, load_url_history
 
 
 # =====================================
@@ -530,6 +532,8 @@ elif menu == "URL Security Detector":
 
     st.divider()
 
+    # INPUT URL
+
     st.subheader("🔗 Periksa Keamanan URL")
 
     st.write(
@@ -561,7 +565,12 @@ elif menu == "URL Security Detector":
 
                     url_result = analyze_url(url_input)
 
+                    # Simpan hasil pemeriksaan ke riwayat
+                    save_url_history(url_result)
+
                 st.session_state["url_result"] = url_result
+
+                st.success("Pemeriksaan URL berhasil disimpan!")
 
             except Exception as e:
 
@@ -626,6 +635,59 @@ elif menu == "URL Security Detector":
             "jaminan bahwa website aman. Sistem belum memeriksa "
             "isi halaman, reputasi domain secara real-time, "
             "atau file yang diunduh."
+        )
+
+    # =====================================
+    # URL HISTORY
+    # =====================================
+
+    st.divider()
+    st.subheader("📜 Riwayat Pemeriksaan URL")
+
+    url_history = load_url_history()
+
+    if url_history:
+
+        st.write(
+            f"Total pemeriksaan tersimpan: **{len(url_history)}**"
+        )
+
+        history_data = []
+
+        for item in reversed(url_history):
+
+            history_data.append({
+                "Waktu": item["timestamp"],
+                "URL": item["url"],
+                "Domain": item["domain"],
+                "Risk Level": item["risk_level"],
+                "Risk Score": item["risk_score"]
+            })
+
+        st.dataframe(
+            history_data,
+            use_container_width=True,
+            hide_index=True
+        )
+
+        history_json = json.dumps(
+            url_history,
+            indent=4,
+            ensure_ascii=False
+        )
+
+        st.download_button(
+            label="📥 Download Riwayat URL (JSON)",
+            data=history_json,
+            file_name="url_history.json",
+            mime="application/json"
+        )
+
+    else:
+
+        st.info(
+            "Belum ada riwayat pemeriksaan URL. "
+            "Silakan periksa URL terlebih dahulu."
         )
 
     st.divider()

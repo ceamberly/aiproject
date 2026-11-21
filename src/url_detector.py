@@ -1,11 +1,13 @@
 
-import re
-import ipaddress
 from urllib.parse import urlparse
+import ipaddress
+import re
 
 
-# Domain resmi yang dipercaya.
-# Daftar ini bisa ditambah sesuai kebutuhan.
+# =====================================
+# DAFTAR DOMAIN TERPERCAYA
+# =====================================
+
 TRUSTED_DOMAINS = [
     "facebook.com",
     "fb.com",
@@ -21,6 +23,10 @@ TRUSTED_DOMAINS = [
     "icloud.com"
 ]
 
+
+# =====================================
+# KATA-KATA YANG PERLU DIWASPADAI
+# =====================================
 
 SUSPICIOUS_KEYWORDS = [
     "login",
@@ -41,6 +47,10 @@ SUSPICIOUS_KEYWORDS = [
 ]
 
 
+# =====================================
+# DAFTAR URL SHORTENER
+# =====================================
+
 SHORTENER_DOMAINS = [
     "bit.ly",
     "tinyurl.com",
@@ -52,147 +62,223 @@ SHORTENER_DOMAINS = [
 ]
 
 
+# =====================================
+# CEK DOMAIN TERPERCAYA
+# =====================================
+
 def is_trusted_domain(domain):
-    """
-    Memeriksa apakah domain termasuk daftar domain tepercaya.
-    Subdomain resmi juga diperbolehkan.
-    Contoh: accounts.google.com
-    """
+
+    domain = domain.lower().strip(".")
 
     return any(
-        domain == trusted or domain.endswith("." + trusted)
+        domain == trusted
+        or domain.endswith("." + trusted)
         for trusted in TRUSTED_DOMAINS
     )
 
 
-def analyze_url(url):
-    """
-    Menganalisis indikator risiko URL menggunakan
-    Trusted Domain dan Heuristic Detection.
+# =====================================
+# CEK URL
+# =====================================
 
-    Pemeriksaan ini bukan jaminan bahwa URL aman.
-    """
+def analyze_url(url):
 
     if not isinstance(url, str) or not url.strip():
         raise ValueError("URL tidak boleh kosong.")
 
     url = url.strip()
 
-    # Tambahkan skema jika tidak tersedia
-    if not re.match(r"^https?://", url, re.IGNORECASE):
+    # Tambahkan protokol jika belum tersedia
+    if not re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*://", url):
         url = "http://" + url
 
-    try:
-        parsed = urlparse(url)
-        domain = (parsed.hostname or "").lower()
-    except ValueError:
+    parsed = urlparse(url)
+
+    hostname = parsed.hostname
+
+    if not hostname:
         raise ValueError("Format URL tidak valid.")
 
-    if not domain:
-        raise ValueError("Format URL atau nama domain tidak valid.")
+    domain = hostname.lower().strip(".")
 
     score = 0
     findings = []
 
-    def add_finding(points, message):
-        nonlocal score
-        score += points
-        findings.append(message)
-
-    # Periksa domain tepercaya
     trusted = is_trusted_domain(domain)
 
-    if trusted:
+    # =================================
+    # 1. PANJANG URL
+    # =================================
+
+    if len(url) > 100:
+        score += 1
+
         findings.append(
-            "Domain cocok dengan daftar domain resmi yang dipercaya."
+            f"URL memiliki panjang {len(url)} karakter. "
+            "URL yang sangat panjang dapat digunakan untuk menyamarkan tujuan tautan."
         )
 
-    # Panjang URL
-    if len(url) > 100:
-        add_finding(1, "URL memiliki panjang yang tidak biasa.")
+    # =================================
+    # 2. PENGGUNAAN HTTPS
+    # =================================
 
-    if len(url) > 200:
-        add_finding(2, "URL sangat panjang.")
-
-    # HTTPS
     if parsed.scheme.lower() != "https":
-        add_finding(1, "URL tidak menggunakan HTTPS.")
+        score += 1
 
-    # Periksa alamat IP
-    is_ip = False
+        findings.append(
+            f"Protokol '{parsed.scheme.upper()}' digunakan. "
+            "URL tidak menggunakan HTTPS untuk koneksi terenkripsi."
+        )
+
+    # =================================
+    # 3. PENGGUNAAN ALAMAT IP
+    # =================================
+
+    try:
+        ipaddress.ip_address(domain)
+
+        score += 4
+
+        findings.append(
+            f"Alamat tujuan menggunakan IP langsung: '{domain}'. "
+            "Penggunaan IP langsung perlu diwaspadai karena tidak menunjukkan nama domain situs."
+        )
+
+    except ValueError:
+        pass
+
+    # =================================
+    # 4. SIMBOL @
+    # =================================
+
+    if "@" in url:
+        score += 3
+
+        findings.append(
+            "Ditemukan simbol '@' pada URL. "
+            "Simbol ini dapat digunakan untuk menyamarkan alamat tujuan sebenarnya."
+        )
+
+    # =================================
+    # 5. TANDA HUBUNG PADA DOMAIN
+    # =================================
+
+    if "-" in domain:
+        score += 1
+
+        findings.append(
+            f"Domain '{domain}' mengandung tanda hubung (-). "
+            "Pola ini terkadang digunakan pada domain tiruan."
+        )
+
+    # =================================
+    # 6. DOMAIN PUNYCODE
+    # =================================
+
+    if "xn--" in domain:
+        score += 3
+
+        findings.append(
+            f"Domain '{domain}' mengandung format Punycode (xn--). "
+            "Format ini dapat digunakan untuk meniru karakter domain lain."
+        )
+
+    # =================================
+    # 7. SUBDOMAIN BERLEBIHAN
+    # =================================
 
     try:
         ipaddress.ip_address(domain)
         is_ip = True
-        add_finding(3, "Domain menggunakan alamat IP langsung.")
     except ValueError:
-        pass
+        is_ip = False
 
-    # Simbol @
-    if "@" in url:
-        add_finding(
-            3,
-            "URL mengandung simbol @ yang dapat menyamarkan tujuan."
-        )
-
-    # Tanda hubung pada domain
-    if "-" in domain:
-        add_finding(1, "Domain mengandung tanda hubung.")
-
-    # Punycode
-    if "xn--" in domain:
-        add_finding(2, "Domain menggunakan format Punycode.")
-
-    # Banyak subdomain
-    # Alamat IP tidak dihitung sebagai subdomain.
-    # Ambang dibuat lebih tinggi agar tidak mudah salah menandai.
     if not is_ip and len(domain.split(".")) >= 5:
-        add_finding(2, "Domain memiliki banyak bagian subdomain.")
+        score += 2
 
-    # Kata mencurigakan
-    matched_keywords = [
-        keyword
-        for keyword in SUSPICIOUS_KEYWORDS
-        if keyword in url.lower()
-    ]
-
-    # Kata login/verify tidak diberi skor jika domain tepercaya.
-    if matched_keywords and not trusted:
-        add_finding(
-            min(len(matched_keywords), 3),
-            "Mengandung kata mencurigakan: "
-            + ", ".join(matched_keywords)
-        )
-    elif matched_keywords and trusted:
         findings.append(
-            "Kata login/verifikasi ditemukan, tetapi tidak diberi "
-            "skor tambahan karena domain cocok dengan daftar tepercaya."
+            f"Domain memiliki banyak tingkatan subdomain: '{domain}'. "
+            "Struktur ini dapat digunakan untuk membuat alamat terlihat seperti domain lain."
         )
 
-    # URL shortener
-    if domain in SHORTENER_DOMAINS:
-        add_finding(2, "Menggunakan layanan pemendek URL.")
+    # =================================
+    # 8. KATA-KATA MENCURIGAKAN
+    # =================================
 
-    # Tingkat risiko
+    if not trusted:
+
+        found_keywords = []
+
+        for keyword in SUSPICIOUS_KEYWORDS:
+
+            pattern = (
+                r"(?<![a-z0-9])"
+                + re.escape(keyword)
+                + r"(?![a-z0-9])"
+            )
+
+            if re.search(pattern, url.lower()):
+                found_keywords.append(keyword)
+
+        if found_keywords:
+            score += 1
+
+            keyword_text = ", ".join(
+                f"'{word}'" for word in found_keywords
+            )
+
+            findings.append(
+                f"Ditemukan kata yang perlu diwaspadai: {keyword_text}. "
+                "Kata-kata tersebut dapat digunakan sebagai umpan untuk meminta "
+                "informasi akun atau menarik perhatian pengguna."
+            )
+
+    # =================================
+    # 9. URL SHORTENER
+    # =================================
+
+    if any(
+        domain == shortener
+        or domain.endswith("." + shortener)
+        for shortener in SHORTENER_DOMAINS
+    ):
+        score += 2
+
+        findings.append(
+            f"Domain '{domain}' merupakan layanan URL shortener. "
+            "Alamat tujuan sebenarnya tidak terlihat secara langsung."
+        )
+
+    # =================================
+    # 10. KATEGORI RISIKO
+    # =================================
+
     if score >= 6:
-        risk = "High Risk"
+        risk_level = "High Risk"
         status = "Berisiko Tinggi"
+
     elif score >= 3:
-        risk = "Medium Risk"
+        risk_level = "Medium Risk"
         status = "Perlu Diwaspadai"
+
     else:
-        risk = "Low Risk"
-        status = "Indikator Risiko Rendah"
+        risk_level = "Low Risk"
+        status = "Risiko Rendah"
+
+    # =================================
+    # 11. KESIMPULAN
+    # =================================
 
     if not findings:
         findings.append(
-            "Tidak ditemukan indikator mencurigakan dari pemeriksaan dasar."
+            "Tidak ditemukan indikator mencurigakan berdasarkan "
+            "pemeriksaan sederhana sistem."
         )
 
     return {
         "url": url,
         "domain": domain,
-        "risk_level": risk,
+        "risk_level": risk_level,
         "status": status,
         "risk_score": score,
         "findings": findings
