@@ -1,0 +1,94 @@
+[
+    {
+        "id": 1,
+        "timestamp": "2026-11-21 10:12:43",
+        "url": "https://www.facebook.com/login",
+        "domain": "www.facebook.com",
+        "risk_level": "Low Risk",
+        "risk_score": 1,
+        "status": "Indikator Risiko Rendah",
+        "findings": [
+            "Mengandung kata mencurigakan: login"
+        ]
+    },
+    {
+        "id": 2,
+        "timestamp": "2026-11-21 10:13:09",
+        "url": "https://accounts.google.com/signin",
+        "domain": "accounts.google.com",
+        "risk_level": "Low Risk",
+        "risk_score": 2,
+        "status": "Indikator Risiko Rendah",
+        "findings": [
+            "Mengandung kata mencurigakan: account, signin"
+        ]
+    },
+    {
+        "id": 3,
+        "timestamp": "2026-11-21 10:13:32",
+        "url": "http://facebook-login.example.com",
+        "domain": "facebook-login.example.com",
+        "risk_level": "Medium Risk",
+        "risk_score": 3,
+        "status": "Perlu Diwaspadai",
+        "findings": [
+            "URL tidak menggunakan HTTPS.",
+            "Domain mengandung tanda hubung.",
+            "Mengandung kata mencurigakan: login"
+        ]
+    },
+    {
+        "id": 4,
+        "timestamp": "2026-11-21 10:21:25",
+        "url": "https://www.facebook.com/login",
+        "domain": "www.facebook.com",
+        "risk_level": "Low Risk",
+        "risk_score": 0,
+        "status": "Risiko Rendah",
+        "findings": [
+            "Tidak ditemukan indikator mencurigakan berdasarkan pemeriksaan sederhana sistem."
+        ]
+    },
+    {
+        "id": 5,
+        "timestamp": "2026-11-21 10:21:48",
+        "url": "http://secure-account-free-bonus.example.com/login",
+        "domain": "secure-account-free-bonus.example.com",
+        "risk_level": "Medium Risk",
+        "risk_score": 3,
+        "status": "Perlu Diwaspadai",
+        "findings": [
+            "Protokol 'HTTP' digunakan. URL tidak menggunakan HTTPS untuk koneksi terenkripsi.",
+            "Domain 'secure-account-free-bonus.example.com' mengandung tanda hubung (-). Pola ini terkadang digunakan pada domain tiruan.",
+            "Ditemukan kata yang perlu diwaspadai: 'login', 'account', 'secure', 'free', 'bonus'. Kata-kata tersebut dapat digunakan sebagai umpan untuk meminta informasi akun atau menarik perhatian pengguna."
+        ]
+    },
+    {
+        "id": 6,
+        "timestamp": "2026-11-21 10:21:51",
+        "url": "http://secure-account-free-bonus.example.com/login",
+        "domain": "secure-account-free-bonus.example.com",
+        "risk_level": "Medium Risk",
+        "risk_score": 3,
+        "status": "Perlu Diwaspadai",
+        "findings": [
+            "Protokol 'HTTP' digunakan. URL tidak menggunakan HTTPS untuk koneksi terenkripsi.",
+            "Domain 'secure-account-free-bonus.example.com' mengandung tanda hubung (-). Pola ini terkadang digunakan pada domain tiruan.",
+            "Ditemukan kata yang perlu diwaspadai: 'login', 'account', 'secure', 'free', 'bonus'. Kata-kata tersebut dapat digunakan sebagai umpan untuk meminta informasi akun atau menarik perhatian pengguna."
+        ]
+    },
+    {
+        "id": 7,
+        "timestamp": "2026-11-21 10:22:25",
+        "url": "http://192.168.1.100/login/verify",
+        "domain": "192.168.1.100",
+        "risk_level": "High Risk",
+        "risk_score": 6,
+        "status": "Berisiko Tinggi",
+        "findings": [
+            "Protokol 'HTTP' digunakan. URL tidak menggunakan HTTPS untuk koneksi terenkripsi.",
+            "Alamat tujuan menggunakan IP langsung: '192.168.1.100'. Penggunaan IP langsung perlu diwaspadai karena tidak menunjukkan nama domain situs.",
+            "Ditemukan kata yang perlu diwaspadai: 'login', 'verify'. Kata-kata tersebut dapat digunakan sebagai umpan untuk meminta informasi akun atau menarik perhatian pengguna."
+        ]
+    }
+]

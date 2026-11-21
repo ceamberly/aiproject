@@ -1,29 +1,9 @@
-
-import json
-from pathlib import Path
+import streamlit as st
 from datetime import datetime
-
-# Lokasi penyimpanan riwayat
-PROJECT_DIR = Path(__file__).resolve().parent.parent
-HISTORY_FILE = PROJECT_DIR / "reports" / "history.json"
+from src.supabase_client import get_supabase_client
 
 
-def load_history():
-    """Membaca seluruh riwayat analisis."""
-    if not HISTORY_FILE.exists():
-        return []
-
-    try:
-        with open(HISTORY_FILE, "r", encoding="utf-8") as file:
-            return json.load(file)
-    except (json.JSONDecodeError, OSError):
-        return []
-
-
-def save_history(results, source_name, contamination):
-    """Menyimpan hasil analisis ke file JSON."""
-
-    history = load_history()
+def save_history(results, source_name, contamination, user_id=None):
 
     normal_count = int(
         (results["anomaly_status"] == "Normal").sum()
@@ -33,37 +13,70 @@ def save_history(results, source_name, contamination):
         (results["anomaly_status"] == "Anomaly").sum()
     )
 
-    # Mengubah hasil DataFrame menjadi data JSON
-    records = json.loads(
-        results.to_json(orient="records")
-    )
-
-    new_entry = {
-        "id": len(history) + 1,
-        "timestamp": datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S"
-        ),
+    entry = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "source": source_name,
-        "contamination": contamination,
+        "contamination": float(contamination),
         "total_data": len(results),
         "normal": normal_count,
-        "anomaly": anomaly_count,
-        "results": records
+        "anomaly": anomaly_count
     }
 
-    history.append(new_entry)
+    # Jika pengguna login, simpan ke Supabase
+    if user_id:
 
-    HISTORY_FILE.parent.mkdir(
-        parents=True,
-        exist_ok=True
-    )
+        supabase = get_supabase_client()
 
-    with open(HISTORY_FILE, "w", encoding="utf-8") as file:
-        json.dump(
-            history,
-            file,
-            indent=4,
-            ensure_ascii=False
+        data = {
+            "user_id": user_id,
+            "source": source_name,
+            "contamination": float(contamination),
+            "total_data": len(results),
+            "normal": normal_count,
+            "anomaly": anomaly_count
+        }
+
+        response = supabase.table("anomaly_history").insert(
+            data
+        ).execute()
+
+        return response.data
+
+    # Jika tamu, simpan sementara di session
+    if "guest_anomaly_history" not in st.session_state:
+        st.session_state["guest_anomaly_history"] = []
+
+    st.session_state["guest_anomaly_history"].append(entry)
+
+    return entry
+
+
+def load_history(user_id=None):
+
+    # Jika pengguna login, ambil riwayat miliknya
+    if user_id:
+
+        supabase = get_supabase_client()
+
+        response = (
+            supabase.table("anomaly_history")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .execute()
         )
 
-    return new_entry
+        return [
+            {
+                "timestamp": item["created_at"],
+                "source": item["source"],
+                "contamination": item["contamination"],
+                "total_data": item["total_data"],
+                "normal": item["normal"],
+                "anomaly": item["anomaly"]
+            }
+            for item in response.data
+        ]
+
+    # Jika tamu, ambil riwayat sementara
+    return st.session_state.get("guest_anomaly_history", [])

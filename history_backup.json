@@ -1,0 +1,574 @@
+[
+    {
+        "id": 1,
+        "timestamp": "2026-11-21 08:13:13",
+        "source": "sample_data.csv",
+        "contamination": 0.1,
+        "total_data": 22,
+        "normal": 19,
+        "anomaly": 3,
+        "results": [
+            {
+                "amount": 100000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0993243219
+            },
+            {
+                "amount": 150000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1226192943
+            },
+            {
+                "amount": 120000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1602340537
+            },
+            {
+                "amount": 90000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0225560011
+            },
+            {
+                "amount": 200000,
+                "frequency": 4,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.0025062223
+            },
+            {
+                "amount": 110000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.13937903
+            },
+            {
+                "amount": 130000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0996753442
+            },
+            {
+                "amount": 95000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0739848671
+            },
+            {
+                "amount": 175000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0670781124
+            },
+            {
+                "amount": 140000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1436757279
+            },
+            {
+                "amount": 125000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1605526352
+            },
+            {
+                "amount": 160000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1052550855
+            },
+            {
+                "amount": 105000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.060158536
+            },
+            {
+                "amount": 180000,
+                "frequency": 4,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0269570289
+            },
+            {
+                "amount": 115000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1527039712
+            },
+            {
+                "amount": 145000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1206189969
+            },
+            {
+                "amount": 98000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0836238656
+            },
+            {
+                "amount": 155000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0928272716
+            },
+            {
+                "amount": 190000,
+                "frequency": 4,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0405477335
+            },
+            {
+                "amount": 135000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1469732546
+            },
+            {
+                "amount": 5000000,
+                "frequency": 30,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.2244411934
+            },
+            {
+                "amount": 7500000,
+                "frequency": 45,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.2589583115
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "timestamp": "2026-11-21 08:40:16",
+        "source": "sample_data.csv",
+        "contamination": 0.1,
+        "total_data": 22,
+        "normal": 19,
+        "anomaly": 3,
+        "results": [
+            {
+                "amount": 100000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0993243219
+            },
+            {
+                "amount": 150000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1226192943
+            },
+            {
+                "amount": 120000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1602340537
+            },
+            {
+                "amount": 90000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0225560011
+            },
+            {
+                "amount": 200000,
+                "frequency": 4,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.0025062223
+            },
+            {
+                "amount": 110000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.13937903
+            },
+            {
+                "amount": 130000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0996753442
+            },
+            {
+                "amount": 95000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0739848671
+            },
+            {
+                "amount": 175000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0670781124
+            },
+            {
+                "amount": 140000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1436757279
+            },
+            {
+                "amount": 125000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1605526352
+            },
+            {
+                "amount": 160000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1052550855
+            },
+            {
+                "amount": 105000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.060158536
+            },
+            {
+                "amount": 180000,
+                "frequency": 4,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0269570289
+            },
+            {
+                "amount": 115000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1527039712
+            },
+            {
+                "amount": 145000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1206189969
+            },
+            {
+                "amount": 98000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0836238656
+            },
+            {
+                "amount": 155000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0928272716
+            },
+            {
+                "amount": 190000,
+                "frequency": 4,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0405477335
+            },
+            {
+                "amount": 135000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1469732546
+            },
+            {
+                "amount": 5000000,
+                "frequency": 30,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.2244411934
+            },
+            {
+                "amount": 7500000,
+                "frequency": 45,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.2589583115
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "timestamp": "2026-11-21 08:51:01",
+        "source": "sample_data.csv",
+        "contamination": 0.1,
+        "total_data": 22,
+        "normal": 19,
+        "anomaly": 3,
+        "results": [
+            {
+                "amount": 100000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0993243219
+            },
+            {
+                "amount": 150000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1226192943
+            },
+            {
+                "amount": 120000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1602340537
+            },
+            {
+                "amount": 90000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0225560011
+            },
+            {
+                "amount": 200000,
+                "frequency": 4,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.0025062223
+            },
+            {
+                "amount": 110000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.13937903
+            },
+            {
+                "amount": 130000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0996753442
+            },
+            {
+                "amount": 95000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0739848671
+            },
+            {
+                "amount": 175000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0670781124
+            },
+            {
+                "amount": 140000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1436757279
+            },
+            {
+                "amount": 125000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1605526352
+            },
+            {
+                "amount": 160000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1052550855
+            },
+            {
+                "amount": 105000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.060158536
+            },
+            {
+                "amount": 180000,
+                "frequency": 4,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0269570289
+            },
+            {
+                "amount": 115000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1527039712
+            },
+            {
+                "amount": 145000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1206189969
+            },
+            {
+                "amount": 98000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0836238656
+            },
+            {
+                "amount": 155000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0928272716
+            },
+            {
+                "amount": 190000,
+                "frequency": 4,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0405477335
+            },
+            {
+                "amount": 135000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1469732546
+            },
+            {
+                "amount": 5000000,
+                "frequency": 30,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.2244411934
+            },
+            {
+                "amount": 7500000,
+                "frequency": 45,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.2589583115
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "timestamp": "2026-11-21 08:55:16",
+        "source": "sample_data.csv",
+        "contamination": 0.1,
+        "total_data": 22,
+        "normal": 19,
+        "anomaly": 3,
+        "results": [
+            {
+                "amount": 100000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0993243219
+            },
+            {
+                "amount": 150000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1226192943
+            },
+            {
+                "amount": 120000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1602340537
+            },
+            {
+                "amount": 90000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0225560011
+            },
+            {
+                "amount": 200000,
+                "frequency": 4,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.0025062223
+            },
+            {
+                "amount": 110000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.13937903
+            },
+            {
+                "amount": 130000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0996753442
+            },
+            {
+                "amount": 95000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0739848671
+            },
+            {
+                "amount": 175000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0670781124
+            },
+            {
+                "amount": 140000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1436757279
+            },
+            {
+                "amount": 125000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1605526352
+            },
+            {
+                "amount": 160000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1052550855
+            },
+            {
+                "amount": 105000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.060158536
+            },
+            {
+                "amount": 180000,
+                "frequency": 4,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0269570289
+            },
+            {
+                "amount": 115000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1527039712
+            },
+            {
+                "amount": 145000,
+                "frequency": 3,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1206189969
+            },
+            {
+                "amount": 98000,
+                "frequency": 1,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0836238656
+            },
+            {
+                "amount": 155000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0928272716
+            },
+            {
+                "amount": 190000,
+                "frequency": 4,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.0405477335
+            },
+            {
+                "amount": 135000,
+                "frequency": 2,
+                "anomaly_status": "Normal",
+                "anomaly_score": -0.1469732546
+            },
+            {
+                "amount": 5000000,
+                "frequency": 30,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.2244411934
+            },
+            {
+                "amount": 7500000,
+                "frequency": 45,
+                "anomaly_status": "Anomaly",
+                "anomaly_score": 0.2589583115
+            }
+        ]
+    }
+]

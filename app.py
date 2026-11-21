@@ -6,6 +6,7 @@ import json
 
 from pathlib import Path
 
+from src.auth_manager import register_user, login_user, logout_user
 from src.anomaly_detector import detect_anomalies
 from src.history_manager import save_history, load_history
 from src.pdf_report import generate_pdf
@@ -29,6 +30,82 @@ st.set_page_config(
 # =====================================
 
 st.sidebar.title("🤖 AI Security System")
+# =====================================
+# ACCOUNT / AUTHENTICATION
+# =====================================
+
+if "user" not in st.session_state:
+    st.session_state["user"] = None
+
+if st.session_state["user"]:
+    st.sidebar.success(
+        f"Login sebagai: {st.session_state['user']['email']}"
+    )
+
+    if st.sidebar.button("Logout", use_container_width=True):
+        logout_user()
+        st.rerun()
+
+else:
+    auth_mode = st.sidebar.radio(
+        "Akun Pengguna",
+        ["Tamu", "Login", "Registrasi"]
+    )
+
+    if auth_mode == "Login":
+
+        with st.sidebar.form("login_form"):
+            email = st.text_input("Email")
+            password = st.text_input("Password", type="password")
+            login_submit = st.form_submit_button(
+                "Login",
+                use_container_width=True
+            )
+
+        if login_submit:
+            response = login_user(email, password)
+
+            if isinstance(response, dict) and "error" in response:
+                st.sidebar.error(response["error"])
+            else:
+                st.sidebar.success("Login berhasil!")
+                st.rerun()
+
+    elif auth_mode == "Registrasi":
+
+        with st.sidebar.form("register_form"):
+            email = st.text_input("Email")
+            password = st.text_input("Password", type="password")
+            confirm_password = st.text_input(
+                "Konfirmasi Password",
+                type="password"
+            )
+
+            register_submit = st.form_submit_button(
+                "Daftar",
+                use_container_width=True
+            )
+
+        if register_submit:
+
+            if not email or not password:
+                st.sidebar.warning("Email dan password wajib diisi.")
+
+            elif password != confirm_password:
+                st.sidebar.error("Konfirmasi password tidak cocok.")
+
+            elif len(password) < 6:
+                st.sidebar.warning("Password minimal 6 karakter.")
+
+            else:
+                response = register_user(email, password)
+
+                if isinstance(response, dict) and "error" in response:
+                    st.sidebar.error(response["error"])
+                else:
+                    st.sidebar.success(
+                        "Registrasi berhasil. Periksa email jika diminta verifikasi."
+                    )
 
 menu = st.sidebar.radio(
     "Pilih Fitur",

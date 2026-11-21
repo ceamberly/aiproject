@@ -1,58 +1,70 @@
-
-import json
-from pathlib import Path
-from datetime import datetime
+import streamlit as st
+from src.supabase_client import get_supabase_client
 
 
-PROJECT_DIR = Path(__file__).resolve().parent.parent
-HISTORY_FILE = PROJECT_DIR / "reports" / "url_history.json"
+def save_url_history(result, user_id=None):
 
-
-def load_url_history():
-    """Memuat riwayat pemeriksaan URL."""
-
-    if not HISTORY_FILE.exists():
-        return []
-
-    try:
-        with open(HISTORY_FILE, "r", encoding="utf-8") as file:
-            return json.load(file)
-
-    except (json.JSONDecodeError, OSError):
-        return []
-
-
-def save_url_history(result):
-    """Menyimpan hasil pemeriksaan URL."""
-
-    history = load_url_history()
-
-    new_entry = {
-        "id": len(history) + 1,
-        "timestamp": datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S"
-        ),
+    entry = {
         "url": result["url"],
         "domain": result["domain"],
         "risk_level": result["risk_level"],
-        "risk_score": result["risk_score"],
+        "risk_score": int(result["risk_score"]),
         "status": result["status"],
         "findings": result["findings"]
     }
 
-    history.append(new_entry)
+    # Jika pengguna login, simpan ke Supabase
+    if user_id:
 
-    HISTORY_FILE.parent.mkdir(
-        parents=True,
-        exist_ok=True
-    )
+        supabase = get_supabase_client()
 
-    with open(HISTORY_FILE, "w", encoding="utf-8") as file:
-        json.dump(
-            history,
-            file,
-            indent=4,
-            ensure_ascii=False
+        data = {
+            "user_id": user_id,
+            **entry
+        }
+
+        response = supabase.table("url_history").insert(
+            data
+        ).execute()
+
+        return response.data
+
+    # Jika tamu, simpan sementara di session
+    if "guest_url_history" not in st.session_state:
+        st.session_state["guest_url_history"] = []
+
+    st.session_state["guest_url_history"].append(entry)
+
+    return entry
+
+
+def load_url_history(user_id=None):
+
+    # Jika pengguna login, ambil riwayat miliknya
+    if user_id:
+
+        supabase = get_supabase_client()
+
+        response = (
+            supabase.table("url_history")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .execute()
         )
 
-    return new_entry
+        return [
+            {
+                "timestamp": item["created_at"],
+                "url": item["url"],
+                "domain": item["domain"],
+                "risk_level": item["risk_level"],
+                "risk_score": item["risk_score"],
+                "status": item["status"],
+                "findings": item["findings"]
+            }
+            for item in response.data
+        ]
+
+    # Jika tamu, ambil riwayat sementara
+    return st.session_state.get("guest_url_history", [])
